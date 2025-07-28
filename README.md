@@ -10,14 +10,16 @@ A beautiful and interactive web application built with Streamlit that uses 4 dif
 - **Confidence Scores**: Each model provides confidence percentage
 - **Visual Analytics**: Bar charts and pie charts for easy interpretation
 - **Overall Prediction**: Aggregated result from all models
+- **Fast Loading**: Optimized for quick startup and predictions
 
 ## 📊 Model Performance
 
 Based on the training data:
-- **Logistic Regression**: 98.3% accuracy
-- **Decision Tree**: 95.1% accuracy  
-- **Gradient Boosting**: 97.2% accuracy
-- **Random Forest**: 98.1% accuracy
+- **Logistic Regression**: 97.0% accuracy
+- **Decision Tree**: 89.2% accuracy  
+- **Gradient Boosting**: 92.3% accuracy
+- **Random Forest**: 94.0% accuracy
+- **Average Accuracy**: 93.1%
 
 ## 🛠️ Installation
 
@@ -91,7 +93,9 @@ Based on the training data:
 FakeNews/
 ├── app.py              # Main Streamlit application
 ├── requirements.txt    # Python dependencies
+├── train_models.py     # Model training script
 ├── README.md          # This file
+├── models.pkl         # Pre-trained models (created by train_models.py)
 ├── Fake.csv           # Fake news dataset
 └── True.csv           # True news dataset
 ```

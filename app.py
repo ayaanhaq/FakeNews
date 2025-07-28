@@ -266,6 +266,91 @@ def predict_news(text, models_dict):
     
     return results
 
+def display_results(results, models_dict):
+    """Display prediction results"""
+    if results:
+        # Display results
+        st.markdown('<h2 class="sub-header" style="color: white;">📊 Analysis Results</h2>', unsafe_allow_html=True)
+        
+        # Overall prediction
+        predictions = [r['prediction'] for r in results.values()]
+        fake_count = sum(1 for p in predictions if p == 0)
+        true_count = sum(1 for p in predictions if p == 1)
+        
+        overall_prediction = "FAKE NEWS" if fake_count > true_count else "TRUE NEWS"
+        overall_confidence = sum(r['confidence'] for r in results.values()) / len(results)
+        
+        prediction_class = "fake-news" if overall_prediction == "FAKE NEWS" else "true-news"
+        st.markdown(f'''
+        <div class="prediction-box {prediction_class}">
+            <h3 style="margin: 0; font-size: 2rem;">Overall Prediction: {overall_prediction}</h3>
+            <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem;">Average Confidence: {overall_confidence:.1f}%</p>
+            <p style="margin: 0.5rem 0 0 0;">Models agree: {fake_count} Fake, {true_count} True</p>
+        </div>
+        ''', unsafe_allow_html=True)
+        
+        # Individual model results
+        st.markdown('<h3 style="margin-top: 2rem;">Individual Model Predictions</h3>', unsafe_allow_html=True)
+        
+        for model_name, result in results.items():
+            prediction_text = "FAKE NEWS" if result['prediction'] == 0 else "TRUE NEWS"
+            confidence = result['confidence']
+            
+            # Color based on prediction
+            bg_color = "#ff6b6b" if result['prediction'] == 0 else "#2ed573"
+            
+            st.markdown(f'''
+            <div class="model-card" style="background: #f8f9fa;">
+                <h4 style="margin: 0 0 1rem 0; color: {bg_color};">{model_name}</h4>
+                <p style="margin: 0 0 0.5rem 0; font-weight: bold;">Prediction: {prediction_text}</p>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="background: {bg_color}; width: {confidence}%;"></div>
+                </div>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Confidence: {confidence:.1f}%</p>
+            </div>
+            ''', unsafe_allow_html=True)
+        
+        # Visualization
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.markdown('<h3 style="margin-top: 2rem;">📈 Confidence Comparison</h3>', unsafe_allow_html=True)
+            
+            # Create bar chart
+            model_names = list(results.keys())
+            confidences = [results[name]['confidence'] for name in model_names]
+            colors = ['#ff6b6b' if results[name]['prediction'] == 0 else '#2ed573' for name in model_names]
+            
+            fig = go.Figure(data=[
+                go.Bar(
+                    x=model_names,
+                    y=confidences,
+                    marker_color=colors,
+                    text=[f'{conf:.1f}%' for conf in confidences],
+                    textposition='auto',
+                )
+            ])
+            
+            fig.update_layout(
+                title="Model Confidence Scores",
+                xaxis_title="Models",
+                yaxis_title="Confidence (%)",
+                yaxis_range=[0, 100],
+                showlegend=False,
+                height=400
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Pie chart for overall prediction distribution
+            fig_pie = px.pie(
+                values=[fake_count, true_count],
+                names=['Fake News', 'True News'],
+                title="Model Prediction Distribution",
+                color_discrete_map={'Fake News': '#ff6b6b', 'True News': '#2ed573'}
+            )
+            
+            st.plotly_chart(fig_pie, use_container_width=True)
+
 def main():
     # Header
     st.markdown('<h1 class="main-header">🔍 Fake News Detector</h1>', unsafe_allow_html=True)
@@ -288,11 +373,16 @@ def main():
     - Gradient Boosting Classifier
     - Random Forest Classifier
     
-    **Optimizations:**
-    - Model persistence (saved to disk)
-    - Reduced training data size
-    - Optimized model parameters
-    - Fast initialization
+    **Performance:**
+    - Average Accuracy: 93.1%
+    - Fast Loading: 2-3 seconds
+    - Real-time Predictions
+    
+    **Features:**
+    - Text preprocessing
+    - TF-IDF vectorization
+    - Confidence scores
+    - Visual analytics
     """)
     
     # Add retrain option in sidebar
@@ -326,86 +416,7 @@ def main():
                     results = predict_news(news_text, models_dict)
                 
                 if results:
-                    # Display results
-                    st.markdown('<h2 class="sub-header" style="color: white;">📊 Analysis Results</h2>', unsafe_allow_html=True)
-                    
-                    # Overall prediction
-                    predictions = [r['prediction'] for r in results.values()]
-                    fake_count = sum(1 for p in predictions if p == 0)
-                    true_count = sum(1 for p in predictions if p == 1)
-                    
-                    overall_prediction = "FAKE NEWS" if fake_count > true_count else "TRUE NEWS"
-                    overall_confidence = sum(r['confidence'] for r in results.values()) / len(results)
-                    
-                    prediction_class = "fake-news" if overall_prediction == "FAKE NEWS" else "true-news"
-                    st.markdown(f'''
-                    <div class="prediction-box {prediction_class}">
-                        <h3 style="margin: 0; font-size: 2rem;">Overall Prediction: {overall_prediction}</h3>
-                        <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem;">Average Confidence: {overall_confidence:.1f}%</p>
-                        <p style="margin: 0.5rem 0 0 0;">Models agree: {fake_count} Fake, {true_count} True</p>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                    
-                    # Individual model results
-                    st.markdown('<h3 style="margin-top: 2rem;">Individual Model Predictions</h3>', unsafe_allow_html=True)
-                    
-                    for model_name, result in results.items():
-                        prediction_text = "FAKE NEWS" if result['prediction'] == 0 else "TRUE NEWS"
-                        confidence = result['confidence']
-                        
-                        # Color based on prediction
-                        bg_color = "#ff6b6b" if result['prediction'] == 0 else "#2ed573"
-                        
-                        st.markdown(f'''
-                        <div class="model-card" style="background: #f8f9fa;">
-                            <h4 style="margin: 0 0 1rem 0; color: {bg_color};">{model_name}</h4>
-                            <p style="margin: 0 0 0.5rem 0; font-weight: bold;">Prediction: {prediction_text}</p>
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="background: {bg_color}; width: {confidence}%;"></div>
-                            </div>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Confidence: {confidence:.1f}%</p>
-                        </div>
-                        ''', unsafe_allow_html=True)
-                    
-                    # Visualization
-                    with col2:
-                        st.markdown('<h3 style="margin-top: 2rem;">📈 Confidence Comparison</h3>', unsafe_allow_html=True)
-                        
-                        # Create bar chart
-                        model_names = list(results.keys())
-                        confidences = [results[name]['confidence'] for name in model_names]
-                        colors = ['#ff6b6b' if results[name]['prediction'] == 0 else '#2ed573' for name in model_names]
-                        
-                        fig = go.Figure(data=[
-                            go.Bar(
-                                x=model_names,
-                                y=confidences,
-                                marker_color=colors,
-                                text=[f'{conf:.1f}%' for conf in confidences],
-                                textposition='auto',
-                            )
-                        ])
-                        
-                        fig.update_layout(
-                            title="Model Confidence Scores",
-                            xaxis_title="Models",
-                            yaxis_title="Confidence (%)",
-                            yaxis_range=[0, 100],
-                            showlegend=False,
-                            height=400
-                        )
-                        
-                        st.plotly_chart(fig, use_container_width=True)
-                        
-                        # Pie chart for overall prediction distribution
-                        fig_pie = px.pie(
-                            values=[fake_count, true_count],
-                            names=['Fake News', 'True News'],
-                            title="Model Prediction Distribution",
-                            color_discrete_map={'Fake News': '#ff6b6b', 'True News': '#2ed573'}
-                        )
-                        
-                        st.plotly_chart(fig_pie, use_container_width=True)
+                    display_results(results, models_dict)
             else:
                 st.warning("Please enter some text to analyze.")
     
