@@ -214,7 +214,7 @@ def get_models():
         models_dict = train_models_fast()
         
         if models_dict:
-            # Save models for future use
+            # Save models
             if save_models(models_dict):
                 st.success("Models trained and saved successfully!")
     
@@ -296,7 +296,7 @@ def display_results(results, models_dict):
             prediction_text = "FAKE NEWS" if result['prediction'] == 0 else "TRUE NEWS"
             confidence = result['confidence']
             
-            # Color based on prediction
+            
             bg_color = "#ff6b6b" if result['prediction'] == 0 else "#2ed573"
             
             st.markdown(f'''
@@ -310,12 +310,12 @@ def display_results(results, models_dict):
             </div>
             ''', unsafe_allow_html=True)
         
-        # Visualization
+        # Visualize
         col1, col2 = st.columns([2, 1])
         with col1:
             st.markdown('<h3 style="margin-top: 2rem;">📈 Confidence Comparison</h3>', unsafe_allow_html=True)
             
-            # Create bar chart
+            # bar chart
             model_names = list(results.keys())
             confidences = [results[name]['confidence'] for name in model_names]
             colors = ['#ff6b6b' if results[name]['prediction'] == 0 else '#2ed573' for name in model_names]
@@ -341,7 +341,7 @@ def display_results(results, models_dict):
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # Pie chart for overall prediction distribution
+            # Pie chart 
             fig_pie = px.pie(
                 values=[fake_count, true_count],
                 names=['Fake News', 'True News'],
@@ -356,7 +356,7 @@ def main():
     st.markdown('<h1 class="main-header">🔍 Fake News Detector</h1>', unsafe_allow_html=True)
     st.markdown('<p style="text-align: center; font-size: 1.2rem; color: #666;">Analyze news articles with 4 different machine learning models</p>', unsafe_allow_html=True)
     
-    # Load models with progress indicator
+    # progress indicator
     with st.spinner("Loading models..."):
         models_dict = get_models()
     
@@ -385,7 +385,7 @@ def main():
     - Visual analytics
     """)
     
-    # Add retrain option in sidebar
+    # Retrain button
     st.sidebar.markdown("---")
     st.sidebar.markdown("### 🔄 Model Management")
     st.sidebar.markdown("⚠️ **Warning**: Retraining will take 2-3 minutes and delete current models.")
