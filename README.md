@@ -14,8 +14,6 @@ A beautiful and interactive web application built with Streamlit that uses 4 dif
 - **Overall Prediction**: Aggregated result from all models
 - **Fast Loading**: Optimized for quick startup and predictions
 
-![News Detection](https://github.com/ayaanhaq/FakeNews/blob/deploy/ss2.png "News Detection")
-
 ## Model Performance
 
 Based on the training data:
@@ -42,7 +40,7 @@ Based on the training data:
    - Interactive visualizations
    - Model agreement statistics
 
-## 🎨 Features Explained
+## Features Explained
 
 ### Overall Prediction
 - Aggregates results from all 4 models
@@ -59,7 +57,9 @@ Based on the training data:
 - **Bar Chart**: Compares confidence scores across all models
 - **Pie Chart**: Shows the distribution of model predictions
 
-## 🔧 Technical Details
+![News Detection](https://github.com/ayaanhaq/FakeNews/blob/deploy/ss2.png "News Detection")
+
+## Technical Details
 
 ### Data Processing
 - Text preprocessing: lowercase, remove URLs, punctuation, numbers
